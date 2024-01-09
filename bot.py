@@ -11,20 +11,15 @@ tree = app_commands.CommandTree(client)
 
 
 @tree.command(
-    name='hello',
-    description='Says hello to the user'
-)
-async def hello(interaction):
-    await interaction.response.send_message('Hello!')
-
-
-@tree.command(
     name='help',
     description='Displays a list of commands'
 )
 async def help(interaction):
-    await interaction.response.send_message('Help!')
-    await interaction.response.send_message(tree.get_commands())
+    commands = tree.get_commands()
+    help_text = ""
+    for command in commands:
+        help_text += f"{command.name}: {command.description}\n"
+    await interaction.response.send_message(help_text)
 
 
 @tree.command(
