@@ -8,5 +8,5 @@ def handle_response(message) -> str:
         return utils.main()
 
     if p_message == 'cf!help':
-        return "Use cf!contests command to get information"\
+        return "Use cf!contests command to get information "\
             "about coming contests."
