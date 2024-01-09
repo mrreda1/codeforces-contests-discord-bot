@@ -8,18 +8,13 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-def main():
+def contests_list():
     """ To get your API-key visit codeforces.com/settings/api
     Then click on 'Add API key' then pass your key and secret
     For more info about API visit codeforces.com/apiHelp ."""
 
-    return contests_list(os.environ.get("CODEFORCES_API_KEY"),
-                         os.environ.get("CODEFORCES_API_SECRET"))
-
-
-def contests_list(apiKey, secret):
-    """ Get info about coming contests """
-
+    apiKey = os.environ.get("CODEFORCES_API_KEY")
+    secret = os.environ.get("CODEFORCES_API_SECRET")
     crnt_time = int(time())
     methodName = "contest.list"
     rand = random.randint(100000, 999999)
@@ -40,11 +35,11 @@ def contests_list(apiKey, secret):
             duration = contest["durationSeconds"]
             start_date = datetime.fromtimestamp(contest["startTimeSeconds"])
             start_date = start_date.strftime("%A, %B %d, %I:%M")
-            results += f"\n__**{contest['name']}**__"\
-                f"\nStarts at: {start_date}\nTime Remaining: "\
+            results += f"\n> ## __[{contest['name']}](<https://codeforces.com/contests/{contest['id']}>)__ \n"\
+                f"> Starts at: {start_date}\n> Time Remaining: "\
                 f"{int(remain/(60*60*24)):02d} day(s), "\
                 f"{int(remain%(60*60*24)/(60*60)):02d}:"\
                 f"{int(remain%(60*60)/60):02d}\n"\
-                f"Contest duration: {int(duration/(60*60)):02d}:"\
+                f"> Contest duration: {int(duration/(60*60)):02d}:"\
                 f"{int(duration%(60*60)/60):02d}\n"
     return results

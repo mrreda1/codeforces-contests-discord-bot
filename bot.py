@@ -28,7 +28,7 @@ def run_discord_bot():
         description='Displays a list of upcoming contests'
     )
     async def contests(interaction):
-        await interaction.response.send_message(utils.main())
+        await interaction.response.send_message(utils.contests_list())
 
     @client.event
     async def on_ready():
