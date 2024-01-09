@@ -1,10 +1,11 @@
-#!/usr/bin/python3
-
 from datetime import datetime
 from time import time
 import requests
 import hashlib
 import random
+import os
+from dotenv import load_dotenv
+load_dotenv()
 
 
 def main():
@@ -12,8 +13,8 @@ def main():
     Then click on 'Add API key' then pass your key and secret
     For more info about API visit codeforces.com/apiHelp ."""
 
-    return contests_list("7a02319483eec5807c2d283c6420c7a77bfa3672",
-                         "a45591ebc3ac1cc55685df64e222233566caa069")
+    return contests_list(os.environ.get("CODEFORCES_API_KEY"),
+                         os.environ.get("CODEFORCES_API_SECRET"))
 
 
 def contests_list(apiKey, secret):
