@@ -1,11 +1,11 @@
-#!/usr/bin/python3
-
 from datetime import datetime
 from time import time
 import requests
 import hashlib
 import random
 import os
+from dotenv import load_dotenv
+load_dotenv()
 
 
 def main():

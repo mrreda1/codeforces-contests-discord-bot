@@ -2,12 +2,14 @@ import discord
 from discord import app_commands
 import utils
 import os
+from dotenv import load_dotenv
+load_dotenv()
 
 
+TOKEN = os.environ.get("DISCORD_TOKEN")
 intents = discord.Intents.all()
 client = discord.Client(intents=intents)
 tree = app_commands.CommandTree(client)
-TOKEN = os.environ.get("DISCORD_TOKEN")
 
 
 @tree.command(
