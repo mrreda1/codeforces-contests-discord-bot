@@ -20,7 +20,7 @@ def run_discord_bot():
         commands = tree.get_commands()
         help_text = ""
         for command in commands:
-            help_text += f"{command.name}: {command.description}\n"
+            help_text += f"> **{command.name}:** {command.description}\n"
         await interaction.response.send_message(help_text)
 
     @tree.command(
