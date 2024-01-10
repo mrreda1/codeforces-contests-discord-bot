@@ -1,6 +1,8 @@
 import os
+
 import discord
 from dotenv import load_dotenv
+
 import utils
 
 
@@ -28,7 +30,10 @@ def run_discord_bot():
         description='Displays a list of upcoming contests'
     )
     async def contests(interaction):
-        await interaction.response.send_message(utils.contests_list())
+        try:
+            await interaction.response.send_message(utils.contests_list())
+        except Exception as e:
+            print(e)
 
     @client.event
     async def on_ready():

@@ -1,10 +1,12 @@
+import hashlib
+import os
+import random
 from datetime import datetime
 from time import time
+
 import requests
-import hashlib
-import random
-import os
 from dotenv import load_dotenv
+
 load_dotenv()
 
 
@@ -35,7 +37,8 @@ def contests_list():
             duration = contest["durationSeconds"]
             start_date = datetime.fromtimestamp(contest["startTimeSeconds"])
             start_date = start_date.strftime("%A, %B %d, %I:%M")
-            results += f"\n> ## __[{contest['name']}](<https://codeforces.com/contests/{contest['id']}>)__ \n"\
+            results += f"\n> ## __[{contest['name']}](<https://codeforces.com"\
+                f"/contests/{contest['id']}>)__ \n"\
                 f"> Starts at: {start_date}\n> Time Remaining: "\
                 f"{int(remain/(60*60*24)):02d} day(s), "\
                 f"{int(remain%(60*60*24)/(60*60)):02d}:"\
