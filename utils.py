@@ -4,6 +4,7 @@ import requests
 import hashlib
 import random
 import os
+import aiohttp
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -43,3 +44,29 @@ def contests_list():
                 f"> Contest duration: {int(duration/(60*60)):02d}:"\
                 f"{int(duration%(60*60)/60):02d}\n"
     return results
+
+async def user_info(handle):
+    CLIST_API_KEY = os.environ.get("CLIST_API_KEY")
+    CLIST_API_USERNAME = os.environ.get("CLIST_API_USERNAME")
+    CLIST_API_URL = f'https://clist.by:443/api/v4/account/?handle={handle}&order_by=-rating'
+
+    clist_headers = {
+        'Authorization': f'ApiKey {CLIST_API_USERNAME}:{CLIST_API_KEY}'
+    }
+
+    async with aiohttp.ClientSession() as session:
+        async with session.get(CLIST_API_URL, headers=clist_headers) as response:
+            status_code = response.status
+
+            if status_code == 200:
+                stats = {}
+                user_info = await response.json()
+                for website in user_info["objects"]:
+                    webiste_name = website["resource"]
+                    rating = website["rating"]
+                    if rating:
+                        stats[webiste_name] = rating
+                
+                return stats
+            else:
+                raise Exception(f"Error fetching user info for {handle} from clist.by API. Status code: {status_code}")

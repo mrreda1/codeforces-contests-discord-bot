@@ -1,7 +1,20 @@
 import os
 import discord
+from discord import app_commands
 from dotenv import load_dotenv
 import utils
+
+
+def create_embed(username, stats):
+    embed = discord.Embed(
+        title=f'{username}:',
+        color=discord.Color.blue()
+    )
+
+    for site, score in stats.items():
+        embed.add_field(name=site, value=score, inline=False)
+
+    return embed
 
 
 def run_discord_bot():
@@ -10,7 +23,7 @@ def run_discord_bot():
     TOKEN = os.environ.get("DISCORD_TOKEN")
     intents = discord.Intents.all()
     client = discord.Client(intents=intents)
-    tree = discord.app_commands.CommandTree(client)
+    tree = app_commands.CommandTree(client)
 
     @tree.command(
         name='help',
@@ -29,6 +42,26 @@ def run_discord_bot():
     )
     async def contests(interaction):
         await interaction.response.send_message(utils.contests_list())
+
+    @tree.command(
+        name='userstats',
+        description='Shows stats about the user',
+    )
+    @app_commands.describe(handle='Handle of the user')
+    async def userstats(interaction, handle: str):
+        await interaction.response.defer()
+        stats_embed = None
+
+        try:
+            stats = await utils.user_info(handle)
+            stats_embed = create_embed(handle, stats)
+        except Exception as e:
+            print(e)
+
+            await interaction.response.send_message("Error while fetching user stats", ephemeral=True)
+            return
+
+        await interaction.edit_original_response(embed=stats_embed)
 
     @client.event
     async def on_ready():
