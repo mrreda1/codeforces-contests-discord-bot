@@ -45,12 +45,14 @@ async def contests_list(host="codeforces.com"):
                     duration = website["duration"]
                     event_name = website["event"]
                     event_url = website["href"]
+                    id = str(website["id"])
                     contests_list.append({
                         "start_time": start_time,
                         "start_time_unix": start_time_unix,
                         "duration": duration,
                         "name": event_name,
-                        "event_url": event_url
+                        "event_url": event_url,
+                        "id": id
                     })
                 
                 return contests_list
