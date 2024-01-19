@@ -3,6 +3,7 @@ import discord
 from discord import app_commands
 from dotenv import load_dotenv
 import utils
+import traceback
 
 
 def create_embed(username, stats):
@@ -48,7 +49,7 @@ def run_discord_bot():
             contests_list = await utils.contests_list()
             message = await utils.create_contests_message(contests_list)
         except Exception as e:
-            print(e)
+            print(traceback.format_exc())
             await interaction.edit_original_response(content="Error while fetching contests")
             return
 
@@ -70,7 +71,7 @@ def run_discord_bot():
             stats = await utils.user_info(handle)
             stats_embed = create_embed(handle, stats)
         except Exception as e:
-            print(e)
+            print(traceback.format_exc())
 
             await interaction.edit_original_response(content="Error while fetching user stats")
             return
