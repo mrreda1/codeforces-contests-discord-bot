@@ -48,7 +48,7 @@ def run_discord_bot():
             # Call the API only if the cache is empty
             if not contests_cache:
                 print("Fetching contests")
-                contests_cache = await utils.contests_list()
+                contests_cache = await utils.get_upcoming_contests()
 
             for contest in contests_cache.copy():
                 contest_time = contest["start_time"]
@@ -94,7 +94,7 @@ def run_discord_bot():
         contests_list = []
 
         try:
-            contests_list = await utils.contests_list()
+            contests_list = await utils.get_upcoming_contests()
             message = await utils.create_contests_message(contests_list)
         except Exception as e:
             print(traceback.format_exc())
@@ -116,7 +116,7 @@ def run_discord_bot():
         stats_embed = None
 
         try:
-            stats = await utils.user_info(handle)
+            stats = await utils.get_user_info(handle)
             stats_embed = create_embed(handle, stats)
         except Exception as e:
             print(traceback.format_exc())

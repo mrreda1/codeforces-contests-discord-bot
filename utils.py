@@ -28,7 +28,7 @@ async def create_contests_message(contests_list={}):
     return message
 
 
-async def contests_list(host="codeforces.com"):
+async def get_upcoming_contests(host="codeforces.com"):
     CLIST_CONTESTS_API = f"https://clist.by:443/api/v4/contest/?upcoming=true&order_by=start&host={host}"
     
     async with aiohttp.ClientSession() as session:
@@ -61,7 +61,7 @@ async def contests_list(host="codeforces.com"):
                 raise Exception(f"Error fetching contests from clist.by API. Status code: {status_code}")
 
 
-async def user_info(handle):
+async def get_user_info(handle):
     CLIST_USER_API = f'https://clist.by:443/api/v4/account/?handle={handle}&order_by=-rating'
 
     async with aiohttp.ClientSession() as session:
