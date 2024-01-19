@@ -9,6 +9,13 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
+CLIST_API_KEY = os.environ.get("CLIST_API_KEY")
+CLIST_API_USERNAME = os.environ.get("CLIST_API_USERNAME")
+CLIST_HEADERS = {
+    'Authorization': f'ApiKey {CLIST_API_USERNAME}:{CLIST_API_KEY}'
+}
+
+
 def contests_list():
     """ To get your API-key visit codeforces.com/settings/api
     Then click on 'Add API key' then pass your key and secret
@@ -46,16 +53,10 @@ def contests_list():
     return results
 
 async def user_info(handle):
-    CLIST_API_KEY = os.environ.get("CLIST_API_KEY")
-    CLIST_API_USERNAME = os.environ.get("CLIST_API_USERNAME")
     CLIST_API_URL = f'https://clist.by:443/api/v4/account/?handle={handle}&order_by=-rating'
 
-    clist_headers = {
-        'Authorization': f'ApiKey {CLIST_API_USERNAME}:{CLIST_API_KEY}'
-    }
-
     async with aiohttp.ClientSession() as session:
-        async with session.get(CLIST_API_URL, headers=clist_headers) as response:
+        async with session.get(CLIST_API_URL, headers=CLIST_HEADERS) as response:
             status_code = response.status
 
             if status_code == 200:
