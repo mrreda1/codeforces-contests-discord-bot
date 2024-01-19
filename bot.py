@@ -1,9 +1,17 @@
 import os
 import discord
 from discord import app_commands
+from discord.ext import tasks
 from dotenv import load_dotenv
+from datetime import datetime, timedelta
 import utils
 import traceback
+import pytz
+
+
+contests_cache = []
+reminders_sent = set()
+reminder_channel = None
 
 
 def create_embed(username, stats):
@@ -26,6 +34,46 @@ def run_discord_bot():
     client = discord.Client(intents=intents)
     tree = app_commands.CommandTree(client)
 
+    @tasks.loop(minutes=1)
+    async def check_contests():
+        global reminder_channel, contests_cache, reminders_sent
+
+        if not reminder_channel:
+            check_contests.cancel()
+            return
+
+        try:
+            now = datetime.now(pytz.timezone("Africa/Cairo"))
+
+            # Call the API only if the cache is empty
+            if not contests_cache:
+                print("Fetching contests")
+                contests_cache = await utils.contests_list()
+
+            for contest in contests_cache.copy():
+                contest_time = contest["start_time"]
+                time_diff = contest_time - now
+
+                reminder_times = [(timedelta(days=1), '1 day'),
+                                  (timedelta(hours=12), '12 hours'),
+                                  (timedelta(hours=6), '6 hours'),
+                                  (timedelta(hours=1), '1 hour'),
+                                  (timedelta(minutes=30), '30 minutes'),
+                                  (timedelta(minutes=10), '10 minutes')]
+
+                for reminder_time, reminder_label in reminder_times:
+                    if timedelta(minutes=1) >= abs(time_diff - reminder_time) and contest['id'] + reminder_label not in reminders_sent:
+                        await reminder_channel.send(f"**:alarm_clock: | [{contest['name']}](<{contest['event_url']}>) starts in {reminder_label}**")
+                        reminders_sent.add(contest['id'] + reminder_label)
+                        break
+
+                if time_diff <= timedelta(minutes=10):
+                    # Remove contest from cache after the final reminder
+                    contests_cache.remove(contest)
+
+        except Exception as e:
+            print(traceback.format_exc())
+
     @tree.command(
         name='help',
         description='Displays a list of commands'
@@ -44,7 +92,7 @@ def run_discord_bot():
     async def contests(interaction):
         await interaction.response.defer()
         contests_list = []
-        
+
         try:
             contests_list = await utils.contests_list()
             message = await utils.create_contests_message(contests_list)
@@ -77,6 +125,17 @@ def run_discord_bot():
             return
 
         await interaction.edit_original_response(embed=stats_embed)
+
+    @tree.command(
+        name='set_reminder_channel',
+        description='Sets the channel to send reminders in',
+    )
+    @app_commands.checks.has_permissions(administrator=True)
+    async def set_reminder_channel(interaction, channel: discord.TextChannel):
+        global reminder_channel
+        reminder_channel = channel
+        check_contests.start()
+        await interaction.response.send_message(f"Reminder channel set to {channel.mention}")
 
     @client.event
     async def on_ready():
