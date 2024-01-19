@@ -1,5 +1,6 @@
-from datetime import datetime
-from time import time
+from datetime import datetime, timedelta
+import time
+import pytz
 import requests
 import hashlib
 import random
@@ -16,41 +17,36 @@ CLIST_HEADERS = {
 }
 
 
-def contests_list():
-    """ To get your API-key visit codeforces.com/settings/api
-    Then click on 'Add API key' then pass your key and secret
-    For more info about API visit codeforces.com/apiHelp ."""
+async def contests_list(host="codeforces.com"):
+    CLIST_CONTESTS_API = f"https://clist.by:443/api/v4/contest/?upcoming=true&order_by=start&host={host}"
+    
+    async with aiohttp.ClientSession() as session:
+        async with session.get(CLIST_CONTESTS_API, headers=CLIST_HEADERS) as response:
+            status_code = response.status
+            contests_list = []
 
-    apiKey = os.environ.get("CODEFORCES_API_KEY")
-    secret = os.environ.get("CODEFORCES_API_SECRET")
-    crnt_time = int(time())
-    methodName = "contest.list"
-    rand = random.randint(100000, 999999)
-    encrypt = "{}/{}?apiKey={}&time={}#{}".format(
-        rand, methodName, apiKey, crnt_time, secret)
-    hash = hashlib.sha512(encrypt.encode('UTF-8')).hexdigest()
-    apiSig = "{}{}".format(rand, hash)
-    args = "apiKey={}&time={}&apiSig={}".format(apiKey, crnt_time, apiSig)
-    target = "https://codeforces.com/api/{}?{}".format(methodName, args)
-    data = requests.get(target).json()
-    if (data["status"] == "FAILED"):
-        print(f"\033[4mRequest failed...\033[0m\n{data['comment']}")
-        return
-    results = ''
-    for contest in data['result']:
-        if (contest["phase"] == "BEFORE"):
-            remain = -contest["relativeTimeSeconds"]
-            duration = contest["durationSeconds"]
-            start_date = datetime.fromtimestamp(contest["startTimeSeconds"])
-            start_date = start_date.strftime("%A, %B %d, %I:%M")
-            results += f"\n> ## __[{contest['name']}](<https://codeforces.com/contests/{contest['id']}>)__ \n"\
-                f"> Starts at: {start_date}\n> Time Remaining: "\
-                f"{int(remain/(60*60*24)):02d} day(s), "\
-                f"{int(remain%(60*60*24)/(60*60)):02d}:"\
-                f"{int(remain%(60*60)/60):02d}\n"\
-                f"> Contest duration: {int(duration/(60*60)):02d}:"\
-                f"{int(duration%(60*60)/60):02d}\n"
-    return results
+            if status_code == 200:
+                contests = await response.json()
+                for website in contests["objects"]:
+                    start_time = datetime.fromisoformat(website["start"])
+                    start_time = start_time.replace(tzinfo=pytz.utc).astimezone(pytz.timezone("Africa/Cairo"))
+                    start_time_unix = int(time.mktime(start_time.timetuple()))
+                    duration = website["duration"]
+                    event_name = website["event"]
+                    event_url = website["href"]
+                    contests_list.append({
+                        "start_time": start_time,
+                        "start_time_unix": start_time_unix,
+                        "duration": duration,
+                        "name": event_name,
+                        "event_url": event_url
+                    })
+                
+                return contests_list
+
+            else:
+                raise Exception(f"Error fetching contests from clist.by API. Status code: {status_code}")
+
 
 async def user_info(handle):
     CLIST_USER_API = f'https://clist.by:443/api/v4/account/?handle={handle}&order_by=-rating'
