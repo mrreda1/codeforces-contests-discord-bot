@@ -46,7 +46,7 @@ def run_discord_bot():
         
         try:
             contests_list = await utils.contests_list()
-            message = await utils.contests_list_message(contests_list)
+            message = await utils.create_contests_message(contests_list)
         except Exception as e:
             print(e)
             await interaction.edit_original_response(content="Error while fetching contests")
