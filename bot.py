@@ -58,7 +58,7 @@ def run_discord_bot():
         except Exception as e:
             print(e)
 
-            await interaction.response.send_message("Error while fetching user stats", ephemeral=True)
+            await interaction.edit_original_response(content="Error while fetching user stats")
             return
 
         await interaction.edit_original_response(embed=stats_embed)
