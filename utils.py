@@ -53,10 +53,10 @@ def contests_list():
     return results
 
 async def user_info(handle):
-    CLIST_API_URL = f'https://clist.by:443/api/v4/account/?handle={handle}&order_by=-rating'
+    CLIST_USER_API = f'https://clist.by:443/api/v4/account/?handle={handle}&order_by=-rating'
 
     async with aiohttp.ClientSession() as session:
-        async with session.get(CLIST_API_URL, headers=CLIST_HEADERS) as response:
+        async with session.get(CLIST_USER_API, headers=CLIST_HEADERS) as response:
             status_code = response.status
 
             if status_code == 200:
