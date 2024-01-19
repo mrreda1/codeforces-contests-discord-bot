@@ -17,6 +17,20 @@ CLIST_HEADERS = {
 }
 
 
+async def create_contests_message(contests_list={}):
+    if not contests_list:
+        contests_list = await contests_list()
+
+    message = ""
+    for contest in contests_list:
+        message += f"""> ## __[{contest['name']}](<{contest['event_url']}>)__
+> Starts <t:{contest['start_time_unix']}:R> (Cairo Time)
+> Contest duration: {int(contest['duration']/(60*60)):02d}:{int(contest['duration']%(60*60)/60):02d}
+
+"""
+    return message
+
+
 async def contests_list(host="codeforces.com"):
     CLIST_CONTESTS_API = f"https://clist.by:443/api/v4/contest/?upcoming=true&order_by=start&host={host}"
     
