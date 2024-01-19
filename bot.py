@@ -41,7 +41,21 @@ def run_discord_bot():
         description='Displays a list of upcoming contests'
     )
     async def contests(interaction):
-        await interaction.response.send_message(utils.contests_list())
+        await interaction.response.defer()
+        contests_list = []
+        
+        try:
+            contests_list = await utils.contests_list()
+            message = await utils.contests_list_message(contests_list)
+        except Exception as e:
+            print(e)
+            await interaction.edit_original_response(content="Error while fetching contests")
+            return
+
+        if contests_list:
+            await interaction.edit_original_response(content=message)
+        else:
+            await interaction.edit_original_response(content="No upcoming contests found.")
 
     @tree.command(
         name='userstats',
