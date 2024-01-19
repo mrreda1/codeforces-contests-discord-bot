@@ -1,9 +1,6 @@
 from datetime import datetime, timedelta
 import time
 import pytz
-import requests
-import hashlib
-import random
 import os
 import aiohttp
 from dotenv import load_dotenv
