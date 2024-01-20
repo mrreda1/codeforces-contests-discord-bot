@@ -12,6 +12,7 @@ import pytz
 contests_cache = []
 reminders_sent = set()
 reminder_channel = None
+reminder_time = timedelta(minutes=15)
 
 
 def create_embed(username, stats):
@@ -54,21 +55,11 @@ def run_discord_bot():
                 contest_time = contest["start_time"]
                 time_diff = contest_time - now
 
-                reminder_times = [(timedelta(days=1), '1 day'),
-                                  (timedelta(hours=12), '12 hours'),
-                                  (timedelta(hours=6), '6 hours'),
-                                  (timedelta(hours=1), '1 hour'),
-                                  (timedelta(minutes=30), '30 minutes'),
-                                  (timedelta(minutes=10), '10 minutes')]
+                if timedelta(minutes=1) >= abs(time_diff - reminder_time) and contest['id'] not in reminders_sent:
+                    await reminder_channel.send(f"@everyone **:alarm_clock: | [{contest['name']}](<{contest['event_url']}>) starts in 15 minutes**")
+                    reminders_sent.add(contest['id'])
 
-                for reminder_time, reminder_label in reminder_times:
-                    if timedelta(minutes=1) >= abs(time_diff - reminder_time) and contest['id'] + reminder_label not in reminders_sent:
-                        await reminder_channel.send(f"**:alarm_clock: | [{contest['name']}](<{contest['event_url']}>) starts in {reminder_label}**")
-                        reminders_sent.add(contest['id'] + reminder_label)
-                        break
-
-                if time_diff <= timedelta(minutes=10):
-                    # Remove contest from cache after the final reminder
+                if time_diff <= timedelta(minutes=5):
                     contests_cache.remove(contest)
 
         except Exception as e:
@@ -134,8 +125,8 @@ def run_discord_bot():
     async def set_reminder_channel(interaction, channel: discord.TextChannel):
         global reminder_channel
         reminder_channel = channel
-        check_contests.start()
         await interaction.response.send_message(f"Reminder channel set to {channel.mention}")
+        check_contests.start()
 
     @set_reminder_channel.error
     async def on_set_reminder_channel_error(interaction, error):
