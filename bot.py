@@ -11,7 +11,7 @@ import pytz
 
 contests_cache = []
 reminders_sent = set()
-reminder_channel = None
+reminder_channel = {}
 reminder_time = timedelta(minutes=15)
 
 
@@ -55,9 +55,14 @@ def run_discord_bot():
                 contest_time = contest["start_time"]
                 time_diff = contest_time - now
 
-                if timedelta(minutes=1) >= abs(time_diff - reminder_time) and contest['id'] not in reminders_sent:
-                    await reminder_channel.send(f"@everyone **:alarm_clock: | [{contest['name']}](<{contest['event_url']}>) starts in 15 minutes**")
-                    reminders_sent.add(contest['id'])
+                for server_id, channel in reminder_channel.items():
+                    if timedelta(minutes=1) >= abs(time_diff - reminder_time) and contest['id'] not in reminders_sent:
+                        try:
+                            await channel.send(f"@everyone **:alarm_clock: | [{contest['name']}](<{contest['event_url']}>) starts in 15 minutes**")
+                        except:
+                            print(traceback.format_exc())
+
+                        reminders_sent.add(contest['id'])
 
                 if time_diff <= timedelta(minutes=5):
                     contests_cache.remove(contest)
@@ -124,7 +129,8 @@ def run_discord_bot():
     @app_commands.checks.has_permissions(administrator=True)
     async def set_reminder_channel(interaction, channel: discord.TextChannel):
         global reminder_channel
-        reminder_channel = channel
+        server_id = interaction.guild.id
+        reminder_channel[server_id] = channel
         await interaction.response.send_message(f"Reminder channel set to {channel.mention}")
         check_contests.start()
 
