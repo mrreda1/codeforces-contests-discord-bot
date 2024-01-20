@@ -137,6 +137,11 @@ def run_discord_bot():
         check_contests.start()
         await interaction.response.send_message(f"Reminder channel set to {channel.mention}")
 
+    @set_reminder_channel.error
+    async def on_set_reminder_channel_error(interaction, error):
+        if isinstance(error, app_commands.errors.CheckFailure):
+            await interaction.response.send_message("You don't have permission to use this command.", ephemeral=True)
+
     @client.event
     async def on_ready():
         await tree.sync()
