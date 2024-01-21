@@ -10,11 +10,19 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-def get_user(name):
+def get_user(handle: str):
     link = "https://codeforces.com/api/user.info?handles="
-    target = link + name
-    data = requests.get(target).json()
-    return data
+    target = link + handle
+
+    try:
+        data = requests.get(target).json()
+    except Exception:
+        return ""
+
+    if (data["status"] == "OK"):
+        return data["result"][0]
+
+    return ""
 
 
 def contests_list():
@@ -26,7 +34,6 @@ def contests_list():
     secret = os.environ.get("CODEFORCES_API_SECRET")
     crnt_time = int(time())
     methodName = "contest.list"
-    timezone = +2
     rand = random.randint(100000, 999999)
     encrypt = "{}/{}?apiKey={}&time={}#{}".format(
         rand, methodName, apiKey, crnt_time, secret)

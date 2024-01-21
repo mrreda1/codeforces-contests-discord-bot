@@ -1,8 +1,6 @@
 import os
-
 import discord
 from dotenv import load_dotenv
-
 import utils
 
 
@@ -18,36 +16,44 @@ def run_discord_bot():
         name='help',
         description='Displays a list of commands'
     )
-    async def help(interaction):
+    async def help(ctx):
         commands = tree.get_commands()
         help_text = ""
         for command in commands:
             help_text += f"> **{command.name}:** {command.description}\n"
-        await interaction.response.send_message(help_text)
+        await ctx.response.send_message(help_text)
 
-    # @tree.command(
-    #     name='ping',
-    #     description='test command'
-    # )
-    # async def ping(interaction, handle):
-    #     embed = discord.Embed(
-    #         colour=discord.Colour.dark_teal(),
-    #         description="this is the description",
-    #         title="this is the title"
-    #     )
-    #     result = utils.get_user(handle)
-    #     user = result["result"][0]["handle"]
-    #
-    #     embed.set_author(name=user, url="https://www.youtube.com")
-    #     await interaction.response.send_message(embed=embed)
+    @tree.command(
+        name='userinfo',
+        description='Get user information in codeforces.'
+    )
+    @discord.app_commands.describe(handle='User\'s handle in codeforces.')
+    async def userinfo(ctx, handle: str):
+        user = utils.get_user(handle)
+        if (user == 0):
+            await ctx.response.send_message(f"User '{handle}'"
+                                            " not found!")
+        CR = f":bar_chart: **Contest rating**: {user['rating']} \
+        (max, {user['maxRank']}, {user['maxRating']})"
+        CNT = f":star2: **Contribution**: {user['contribution']}"
+        FRND = f":star: **Friend of**: {user['friendOfCount']}"
+        embed = discord.Embed(
+            title=user["handle"] + "\n\n",
+            url="https://codeforces.com/profile/" + user["handle"],
+            description=f"ㅤ\n{CR}\n\n{CNT}\n\n{FRND}",
+            color=0xFF5733
+        )
+        embed.set_author(name=user['rank'])
+        embed.set_thumbnail(url=user["titlePhoto"])
+        await ctx.response.send_message(embed=embed)
 
     @tree.command(
         name='contests',
         description='Displays a list of upcoming contests'
     )
-    async def contests(interaction):
+    async def contests(ctx):
         try:
-            await interaction.response.send_message(utils.contests_list())
+            await ctx.response.send_message(utils.contests_list())
         except Exception as e:
             print(e)
 
