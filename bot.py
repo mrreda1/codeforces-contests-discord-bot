@@ -25,19 +25,21 @@ def run_discord_bot():
             help_text += f"> **{command.name}:** {command.description}\n"
         await interaction.response.send_message(help_text)
 
-    @tree.command(
-        name='ping',
-        description='test command'
-    )
-    async def ping(interaction):
-        # embed = discord.Embed(
-        #     colour=discord.Colour.dark_teal(),
-        #     description="this is the description",
-        #     title="this is the title"
-        # )
-        # embed.set_footer(text="this is the footer")
-        # embed.set_author(name="Richard", url="https://www.youtube.com")
-        await interaction.response.send_message("fds")
+    # @tree.command(
+    #     name='ping',
+    #     description='test command'
+    # )
+    # async def ping(interaction, handle):
+    #     embed = discord.Embed(
+    #         colour=discord.Colour.dark_teal(),
+    #         description="this is the description",
+    #         title="this is the title"
+    #     )
+    #     result = utils.get_user(handle)
+    #     user = result["result"][0]["handle"]
+    #
+    #     embed.set_author(name=user, url="https://www.youtube.com")
+    #     await interaction.response.send_message(embed=embed)
 
     @tree.command(
         name='contests',
