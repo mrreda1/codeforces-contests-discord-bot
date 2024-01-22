@@ -30,11 +30,16 @@ def run_discord_bot():
     @discord.app_commands.describe(handle='User\'s handle in codeforces.')
     async def userinfo(ctx, handle: str):
         user = utils.get_user(handle)
-        if (user == 0):
-            await ctx.response.send_message(f"User '{handle}'"
-                                            " not found!")
-        CR = f":bar_chart: **Contest rating**: {user['rating']} \
-        (max, {user['maxRank']}, {user['maxRating']})"
+        if (user == ""):
+            await ctx.response.send_message("There is no account "
+                                            f"with the handle '{handle}'")
+            return
+        try:
+            CR = f":bar_chart: **Contest rating**: {user['rating']} \
+            (max, {user['maxRank']}, {user['maxRating']})ㅤ"
+        except Exception:
+            CR = ":bar_chart: **Contest rating**: 0ㅤㅤㅤ"
+
         CNT = f":star2: **Contribution**: {user['contribution']}"
         FRND = f":star: **Friend of**: {user['friendOfCount']}"
         embed = discord.Embed(
@@ -43,7 +48,11 @@ def run_discord_bot():
             description=f"ㅤ\n{CR}\n\n{CNT}\n\n{FRND}",
             color=0xFF5733
         )
-        embed.set_author(name=user['rank'])
+        try:
+            embed.set_author(name=user['rank'].title())
+        except Exception:
+            embed.set_author(name="Unrated")
+
         embed.set_thumbnail(url=user["titlePhoto"])
         await ctx.response.send_message(embed=embed)
 
