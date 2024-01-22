@@ -32,11 +32,11 @@ def run_discord_bot():
         user = utils.get_user(handle)
         rankcolor = ""
 
-        colors = {"newbie": 0xCCCCCC, "legendary grandmaster": 0xAA0000,
-                  "pupil": 0x77FF77, "international grandmaster": 0xFF3333,
-                  "expert": 0xAAAAFF, "candidate master": 0xFF88FF,
-                  "master": 0xFFCC88, "international master": 0xFFBB55,
-                  "grandmaster": 0xFF7777, "specialist": 0x77DDBB}
+        colors = {"newbie": 0x808080, "legendary grandmaster": 0xFF0000,
+                  "pupil": 0x028000, "international grandmaster": 0xFF0000,
+                  "expert": 0x0000FF, "candidate master": 0xAA00AA,
+                  "master": 0xFF8C00, "international master": 0xFF8C00,
+                  "grandmaster": 0xFF0000, "specialist": 0x03A89E}
 
         if (user == ""):
             await ctx.response.send_message("There is no account "
