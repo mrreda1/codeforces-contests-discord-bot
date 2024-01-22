@@ -30,6 +30,14 @@ def run_discord_bot():
     @discord.app_commands.describe(handle='User\'s handle in codeforces.')
     async def userinfo(ctx, handle: str):
         user = utils.get_user(handle)
+        rankcolor = ""
+
+        colors = {"newbie": 0xCCCCCC, "legendary grandmaster": 0xAA0000,
+                  "pupil": 0x77FF77, "international grandmaster": 0xFF3333,
+                  "expert": 0xAAAAFF, "candidate master": 0xFF88FF,
+                  "master": 0xFFCC88, "international master": 0xFFBB55,
+                  "grandmaster": 0xFF7777, "specialist": 0x77DDBB}
+
         if (user == ""):
             await ctx.response.send_message("There is no account "
                                             f"with the handle '{handle}'")
@@ -37,8 +45,10 @@ def run_discord_bot():
         try:
             CR = f":bar_chart: **Contest rating**: {user['rating']} \
             (max, {user['maxRank']}, {user['maxRating']})ㅤ"
+            rankcolor = colors.get(user['rank'])
         except Exception:
             CR = ":bar_chart: **Contest rating**: 0ㅤㅤㅤ"
+            rankcolor = 0
 
         CNT = f":star2: **Contribution**: {user['contribution']}"
         FRND = f":star: **Friend of**: {user['friendOfCount']}"
@@ -46,7 +56,7 @@ def run_discord_bot():
             title=user["handle"] + "\n\n",
             url="https://codeforces.com/profile/" + user["handle"],
             description=f"ㅤ\n{CR}\n\n{CNT}\n\n{FRND}",
-            color=0xFF5733
+            color=rankcolor
         )
         try:
             embed.set_author(name=user['rank'].title())
