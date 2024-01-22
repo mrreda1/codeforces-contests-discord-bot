@@ -34,6 +34,7 @@ def contests_list():
     secret = os.environ.get("CODEFORCES_API_SECRET")
     crnt_time = int(time())
     methodName = "contest.list"
+    timezone = +2
     rand = random.randint(100000, 999999)
     encrypt = "{}/{}?apiKey={}&time={}#{}".format(
         rand, methodName, apiKey, crnt_time, secret)
@@ -48,9 +49,9 @@ def contests_list():
     results = ''
     for contest in data['result']:
         if (contest["phase"] == "BEFORE"):
-            remain = -contest["relativeTimeSeconds"]
+            remain = -contest["relativeTimeSeconds"] + timezone*60*60
             duration = contest["durationSeconds"]
-            startTimeSeconds = contest["startTimeSeconds"]
+            startTimeSeconds = contest["startTimeSeconds"] + timezone*60*60
             start_date = datetime.fromtimestamp(startTimeSeconds)
             start_date = start_date.strftime("%A, %B %d, %I:%M")
             results += f"\n> ## __[{contest['name']}](<https://codeforces.com"\
