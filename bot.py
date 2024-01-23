@@ -56,6 +56,19 @@ def run_discord_bot():
             await ctx.response.send_message(f"{username} don't have a handle")
 
     @tree.command(
+        name='getmyhandle',
+        description='To get your synced codeforces handle'
+    )
+    async def getmyhandle(ctx):
+        handle = utils.gethandle(str(ctx.user.id))
+        if (handle):
+            user = utils.get_user(handle)
+            embed = utils.makeUserEmbed(user)
+            await ctx.response.send_message(embed=embed)
+        else:
+            await ctx.response.send_message("You don't have a handle")
+
+    @tree.command(
         name='userinfo',
         description='Get user information in codeforces.'
     )
