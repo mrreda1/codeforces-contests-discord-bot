@@ -24,46 +24,51 @@ def run_discord_bot():
         await ctx.response.send_message(help_text)
 
     @tree.command(
+        name='synchandle',
+        description='Sync codeforces handle with discord username'
+    )
+    @discord.app_commands.describe(handle='Your handle in codeforces.')
+    async def synchandle(ctx, handle: str):
+        result = utils.synchandle(ctx.user.id, handle)
+        if (result):
+            await ctx.response.send_message("Your account "
+                                            f"synced with '{result}'")
+        else:
+            await ctx.response.send_message("There is no account "
+                                            f"with the handle '{handle}'")
+
+    @tree.command(
+        name='gethandle',
+        description='Get codeforces handle with discord id'
+    )
+    @discord.app_commands.describe(id='Discord account id')
+    async def gethandle(ctx, id: str):
+        handle = utils.gethandle(id)
+        try:
+            username = await client.fetch_user(id)
+        except Exception:
+            await ctx.response.send_message("Wrong id")
+        if (handle):
+            user = utils.get_user(handle)
+            embed = utils.makeUserEmbed(user)
+            await ctx.response.send_message(embed=embed)
+        else:
+            await ctx.response.send_message(f"{username} don't have a handle")
+
+    @tree.command(
         name='userinfo',
         description='Get user information in codeforces.'
     )
     @discord.app_commands.describe(handle='User\'s handle in codeforces.')
     async def userinfo(ctx, handle: str):
         user = utils.get_user(handle)
-        rankcolor = ""
 
-        colors = {"newbie": 0x808080, "legendary grandmaster": 0xFF0000,
-                  "pupil": 0x028000, "international grandmaster": 0xFF0000,
-                  "expert": 0x0000FF, "candidate master": 0xAA00AA,
-                  "master": 0xFF8C00, "international master": 0xFF8C00,
-                  "grandmaster": 0xFF0000, "specialist": 0x03A89E}
-
-        if (user == ""):
+        if (not user):
             await ctx.response.send_message("There is no account "
                                             f"with the handle '{handle}'")
             return
-        try:
-            CR = f":bar_chart: **Contest rating**: {user['rating']} \
-            (max, {user['maxRank']}, {user['maxRating']})ㅤ"
-            rankcolor = colors.get(user['rank'])
-        except Exception:
-            CR = ":bar_chart: **Contest rating**: 0ㅤㅤㅤ"
-            rankcolor = 0
 
-        CNT = f":star2: **Contribution**: {user['contribution']}"
-        FRND = f":star: **Friend of**: {user['friendOfCount']}"
-        embed = discord.Embed(
-            title=user["handle"] + "\n\n",
-            url="https://codeforces.com/profile/" + user["handle"],
-            description=f"ㅤ\n{CR}\n\n{CNT}\n\n{FRND}",
-            color=rankcolor
-        )
-        try:
-            embed.set_author(name=user['rank'].title())
-        except Exception:
-            embed.set_author(name="Unrated")
-
-        embed.set_thumbnail(url=user["titlePhoto"])
+        embed = utils.makeUserEmbed(user)
         await ctx.response.send_message(embed=embed)
 
     @tree.command(
