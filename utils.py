@@ -77,7 +77,8 @@ def synchandle(id, handle):
 
     data[id] = user['handle']
     with open(path, 'w') as f:
-        f.write(json.dumps(data))
+        json.dump(data, f, indent=2)
+        # f.write(json.dumps(data))
 
     return user['handle']
 

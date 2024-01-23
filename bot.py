@@ -25,7 +25,7 @@ def run_discord_bot():
 
     @tree.command(
         name='synchandle',
-        description='Sync codeforces handle with discord username'
+        description='Sync codeforces handle with your discord account'
     )
     @discord.app_commands.describe(handle='Your handle in codeforces.')
     async def synchandle(ctx, handle: str):
