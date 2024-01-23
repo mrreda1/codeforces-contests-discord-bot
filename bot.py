@@ -41,19 +41,20 @@ def run_discord_bot():
         name='gethandle',
         description='Get codeforces handle with discord id'
     )
-    @discord.app_commands.describe(id='Discord account id')
-    async def gethandle(ctx, id: str):
-        handle = utils.gethandle(id)
-        try:
-            username = await client.fetch_user(id)
-        except Exception:
-            await ctx.response.send_message("Wrong id")
+    @discord.app_commands.describe(user='Mention the user that you want '
+                                   'to get his handle')
+    async def gethandle(ctx, user: discord.User):
+        if not user:
+            user = ctx.user
+
+        handle = utils.gethandle(str(user.id))
+
         if (handle):
             user = utils.get_user(handle)
             embed = utils.makeUserEmbed(user)
             await ctx.response.send_message(embed=embed)
         else:
-            await ctx.response.send_message(f"{username} don't have a handle")
+            await ctx.response.send_message(f"{user.name} don't have a handle")
 
     @tree.command(
         name='getmyhandle',
