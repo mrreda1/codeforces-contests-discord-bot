@@ -60,8 +60,6 @@ def makeUserEmbed(user):
     return embed
 
 
-
-
 def synchandle(id, handle):
     path = "./data.json"
     data = dict()
@@ -75,10 +73,9 @@ def synchandle(id, handle):
                 f.seek(0)
                 data = json.load(f)
 
-    data[id] = user['handle']
+    data[str(id)] = user['handle']
     with open(path, 'w') as f:
         json.dump(data, f, indent=2)
-        # f.write(json.dumps(data))
 
     return user['handle']
 
